@@ -1,0 +1,106 @@
+import pandas as pd
+from matplotlib import pyplot as plt
+import numpy as np
+
+#STEP 1: DATA READING AND UNDERSTANDING
+
+from google.colab import files
+uploaded = files.upload()
+
+import io
+data = pd.read_csv(io.BytesIO(uploaded['Final Data.csv']))
+data
+
+x = data.iloc[:,2:8].values
+y = data.iloc[:,12:13].values
+y
+
+# Import train_test_split function
+from sklearn.model_selection import train_test_split
+
+# Split dataset into training set and test set
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.10) # 90% training and 10% test
+
+from sklearn.ensemble import RandomForestRegressor
+regression = RandomForestRegressor(n_estimators = 21, random_state = 0)
+regression.fit(x_train, y_train)
+
+#from sklearn.metrics import r2_score
+#r2_score(y_test, y_pred)
+#Import scikit-learn metrics module for accuracy calculation
+#Import Random Forest Model
+from sklearn.ensemble import RandomForestClassifier
+
+#Create a Gaussian Classifier
+clf=RandomForestClassifier(n_estimators=100)
+
+#Train the model using the training sets y_pred=clf.predict(X_test)
+clf.fit(x_train,y_train)
+
+y_pred=clf.predict(x_test)
+from sklearn import metrics
+# Model Accuracy, how often is the classifier correct?
+print("This Model's Accuracy is:",metrics.accuracy_score(y_test, y_pred))
+
+c = clf.predict([[2, 4, 2, 2, 4, 2]])
+print(c)
+if(c==1):
+  print("His/ Her eye colour is in Blue-gray Cluster")
+if(c==2):
+  print("His/ Her eye colour is in Green-Hazel Cluster")
+if(c==3):
+  print("His/ Her eye colour is in Brown Cluster")
+
+
+# Multi Logistic Regression
+# Finding Color Percentage
+
+from sklearn import linear_model
+eyeColor = linear_model.LinearRegression()
+eyeColor.fit(data[['1st_Codon','2nd_Codon','3rd_Codon','4th_Codon','5th_Codon','6th_Codon']],data[['Blue-Gray','Green-Hazel','Brown']])
+
+hairColor = linear_model.LinearRegression()
+#hairColor.fit(data[['1st_Codon','2nd_Codon','3rd_Codon','4th_Codon','5th_Codon','6th_Codon']],data[["Fair_Pale_Skin","Medium_Skin","Olive_Dark_Skin"]])
+hairColor.fit(data[['1st_Codon','2nd_Codon','3rd_Codon','4th_Codon','5th_Codon','6th_Codon']],data[["Red_Auburn_Hair", "Fair_Blond_Hair", "Light_Brown_Hair", "Dark_Brown_Hair","Black_Hair"]])
+
+
+skinColor = linear_model.LinearRegression()
+#skinColor.fit(data[['1st_Codon','2nd_Codon','3rd_Codon','4th_Codon','5th_Codon','6th_Codon']],data[["Red_Auburn_Hair", "Fair_Blond_Hair", "Light_Brown_Hair", "Dark_Brown_Hair","Black_Hair"]])
+skinColor.fit(data[['1st_Codon','2nd_Codon','3rd_Codon','4th_Codon','5th_Codon','6th_Codon']],data[["Fair_Pale_Skin","Medium_Skin","Olive_Dark_Skin"]])
+
+eyeColorPredict = eyeColor.predict([[2, 4, 2, 2, 4, 2]])
+skinColorPredict = skinColor.predict([[2, 4, 2, 2, 4, 2]])
+hairColorPredict = hairColor.predict([[2, 4, 2, 2, 4, 2]])
+
+
+#print(x)
+blue = eyeColorPredict[0][0]
+green = eyeColorPredict[0][1]
+brown = eyeColorPredict[0][2]
+print("Blue-Gray Colour : ",blue, "%")
+print("Green-Hazel Colour : ",green, "%")
+print("Brown Colour : ",brown, "%")
+
+
+print(skinColorPredict)
+Fair_Pale_Skin = skinColorPredict[0][0]
+Medium_Skin = skinColorPredict[0][1]	
+Olive_Dark_Skin = skinColorPredict[0][2]
+
+print("Fair_Pale_Skin : ",Fair_Pale_Skin, "%")
+print("Medium_Skin : ",Medium_Skin, "%")
+print("Olive_Dark_Skin : ",Olive_Dark_Skin, "%")
+
+print(hairColorPredict)
+
+Red_Auburn_Hair = hairColorPredict[0][0]
+Fair_Blond_Hair = hairColorPredict[0][1]
+Light_Brown_Hair = hairColorPredict[0][2]
+Dark_Brown_Hair = hairColorPredict[0][3]
+Black_Hair = hairColorPredict[0][4]
+
+print("Red_Auburn_Hair : ",Red_Auburn_Hair, "%")
+print("Fair_Blond_Hair : ",Fair_Blond_Hair, "%")
+print("Light_Brown_Hair : ",Light_Brown_Hair, "%")
+print("Dark_Brown_Hair : ",Dark_Brown_Hair, "%")
+print("Black_Hair : ",Black_Hair, "%")
