@@ -1,0 +1,113 @@
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+
+from google.colab import files
+uploaded = files.upload()
+
+import io
+data = pd.read_csv(io.BytesIO(uploaded['Test DataKmeans.csv']))
+data
+
+plt.scatter(data['Blue_Gray'],data['Green_Hazel'],data['Brown'])
+plt.xlim(-30,100)
+plt.ylim(-30,90)
+plt.show()
+
+X = data.iloc[:,9:12].values
+#elbow method
+wcss = []
+for i in range(1,11):
+    k_means = KMeans(n_clusters=i,init='k-means++', random_state=42)
+    k_means.fit(X)
+    wcss.append(k_means.inertia_)
+#plot elbow curve
+plt.plot(np.arange(1,11),wcss)
+plt.xlabel('Clusters')
+plt.ylabel('SSE')
+plt.show()
+
+k_means_optimum = KMeans(n_clusters = 3, init = 'k-means++',  random_state=42)
+y = k_means_optimum.fit_predict(X)
+print(y)
+
+data['cluster'] = y  
+# the above step adds extra column indicating the cluster number for each country
+
+data1 = data[data.cluster==0]
+data2 = data[data.cluster==1]
+data3 = data[data.cluster==2]
+
+kplot = plt.axes(projection='3d')
+xline = np.linspace(0, 15, 1000)
+yline = np.linspace(0, 15, 1000)
+zline = np.linspace(0, 15, 1000)
+kplot.plot3D(xline, yline, zline, 'black')
+# Data for three-dimensional scattered points
+kplot.scatter3D(data1.Blue_Gray, data1.Green_Hazel, data1.Brown, c='blue', label = 'Cluster 1')
+kplot.scatter3D(data1.Blue_Gray, data1.Green_Hazel, data1.Brown, c ='green', label = 'Cluster 2')
+kplot.scatter3D(data1.Blue_Gray, data1.Green_Hazel, data1.Brown, c ='red', label = 'Cluster 3')
+#plt.scatter(k_means_optimum.cluster_centers_[:,0], k_means_optimum.cluster_centers_[:,1], color = 'indigo', s = 200)
+plt.legend()
+plt.title("Kmeans")
+plt.show()
+
+from sklearn.cluster import KMeans
+from statistics import mean
+x = data.iloc[:,9:12] # 1t for rows and second for columns
+x
+
+kmeans = KMeans(3)
+kmeans.fit(x)
+
+identified_clusters = kmeans.fit_predict(x)
+identified_clusters
+
+data_with_clusters = data.copy()
+data_with_clusters['Clusters'] = identified_clusters 
+plt.scatter(data_with_clusters['Green-Hazel'],data_with_clusters['Brown'],c=data_with_clusters['Clusters'],cmap='viridis')
+
+from mpl_toolkits import mplot3d
+import numpy as np
+import matplotlib.pyplot as plt
+
+#data_with_clusters = data.copy()
+#data_with_clusters['Clusters'] = identified_clusters 
+#plt.scatter(data_with_clusters['Green-Hazel'],data_with_clusters['Brown'],c=data_with_clusters['Clusters'],cmap='viridis')
+ 
+# Creating dataset
+z = data_with_clusters['Green-Hazel']
+x = data_with_clusters['Brown']
+y = data_with_clusters['Blue-Gray']
+ 
+# Creating figure
+fig = plt.figure(figsize = (16, 9))
+ax = plt.axes(projection ="3d")
+   
+# Add x, y gridlines
+ax.grid(b = True, color ='grey',
+        linestyle ='-.', linewidth = 0.3,
+        alpha = 0.2)
+ 
+ 
+# Creating color map
+my_cmap = plt.get_cmap('rainbow')
+ 
+# Creating plot
+sctt = ax.scatter3D(x, y, z,
+                    alpha = 0.8,
+                    c = (x + y + z),
+                    cmap = my_cmap,
+                    marker ='*')
+ 
+plt.title("simple 3D scatter plot")
+ax.set_xlabel('X-axis', fontweight ='bold')
+ax.set_ylabel('Y-axis', fontweight ='bold')
+ax.set_zlabel('Z-axis', fontweight ='bold')
+fig.colorbar(sctt, ax = ax, shrink = 0.5, aspect = 5)
+ 
+# show plot
+plt.show()
